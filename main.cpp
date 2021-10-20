@@ -56,6 +56,9 @@ int main() {
                 cin >> i;
                 cout << lst[i] << "\n";
             }
+            else if(command == "sort"){
+                lst.sort();
+            }
         }
         catch(const char* x){
             cout << x << "\n";
@@ -68,21 +71,13 @@ int main() {
 
 
 /*
-push_back 1
-push_back 10
-push_back 5
+push_back 6
 push_back 4
-index 3
-index 2
-pop_mid 2
-push_front 4
-push_front 7
-pop_back
-push_back 8
-insert 3 3
-insert 6 12
-pop_back
-pop_front
-pop_back
-erase 4
+push_back 9
+push_back 1
+push_back 7
+push_front 0
+push_back 2
+push_back 3
+sort
  */

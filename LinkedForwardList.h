@@ -3,6 +3,7 @@
 
 
 #include <iostream>
+#include <vector>
 
 
 template<class T>
@@ -21,6 +22,7 @@ public:
 
     typedef node* pnode;
 
+    int s = 0;
     pnode head = nullptr;
     pnode tail = nullptr;
 
@@ -54,7 +56,7 @@ public:
 
 
     bool empty(){
-        return head == nullptr;
+        return s == 0;
     }
 
     void push_back(const T &x){
@@ -66,6 +68,7 @@ public:
         if(head == nullptr){
             head = v;
         }
+        s += 1;
     }
 
 
@@ -76,6 +79,7 @@ public:
         if(tail == nullptr){
             tail = v;
         }
+        s += 1;
     }
 
 
@@ -106,6 +110,7 @@ public:
         if(tail->r != nullptr){
             tail = tail->r;
         }
+        s += 1;
     }
 
     void pop_front(){
@@ -118,6 +123,7 @@ public:
             tail = nullptr;
         }
         delete v;
+        s -= 1;
     }
 
     void pop_back(){
@@ -137,6 +143,7 @@ public:
         tail = v;
         delete v->r;
         v->r = nullptr;
+        s -= 1;
     }
 
 
@@ -153,6 +160,7 @@ public:
             tail = v;
         }
         v->r = v->r->r;
+        s -= 1;
     }
 
 
@@ -160,6 +168,7 @@ public:
         int i = find(x);
         if(i != -1){
             pop_mid(i);
+            s -= 1;
         }
     }
 
@@ -171,6 +180,84 @@ public:
         }
         return v->x;
     }
+
+
+    void push_back_node(pnode &v){
+        if(tail != nullptr) {
+            tail->r = v;
+        }
+        tail = v;
+        if(head == nullptr){
+            head = v;
+        }
+        s += 1;
+    }
+
+
+    void clear_without_delete(){
+        head = tail = nullptr;
+        s = 0;
+    }
+
+
+    LinkedForwardList merge(LinkedForwardList &a, LinkedForwardList &b){
+        auto v1 = a.head;
+        auto v2 = b.head;
+        LinkedForwardList res;
+        while(v1 != nullptr && v2 != nullptr){
+            if(v1->x <= v2->x){
+                res.push_back_node(v1);
+                v1 = v1->r;
+            }
+            else{
+                res.push_back_node(v2);
+                v2 = v2->r;
+            }
+        }
+        while(v1 != nullptr){
+            res.push_back_node(v1);
+            v1 = v1->r;
+        }
+        while(v2 != nullptr){
+            res.push_back_node(v2);
+            v2 = v2->r;
+        }
+        a.clear_without_delete();
+        b.clear_without_delete();
+        return res;
+    }
+
+
+    void sort(){
+        if(empty()){
+            return;
+        }
+        std::vector<LinkedForwardList> s;
+        auto v = head;
+        while(v != nullptr){
+            s.push_back(LinkedForwardList());
+            auto to = v->r;
+            v->r = nullptr;
+            s.back().push_back_node(v);
+            while(s.size() > 1 && s.back().s >= s[s.size() - 2].s){
+                auto f = merge(s.back(), s[s.size() - 2]);
+                s.pop_back();
+                s.pop_back();
+                s.push_back(f);
+            }
+            v = to;
+        }
+        while(s.size() > 1){
+            auto f = merge(s.back(), s[s.size() - 2]);
+            s.pop_back();
+            s.pop_back();
+            s.push_back(f);
+        }
+        head = s[0].head;
+        tail = s[0].tail;
+        this->s = s[0].s;
+    }
+
 
     template<class Type>
     friend std::ostream& operator<<(std::ostream &, LinkedForwardList<Type>&);
